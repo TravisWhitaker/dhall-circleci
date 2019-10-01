@@ -1,7 +1,5 @@
 let types = ./Schema.dhall
 
-let render = ./Render.dhall
-
 let plainImage =
         λ(i : Text)
       → [ { dockerImage =
@@ -137,4 +135,4 @@ let rdfConfig =
           rdfWorkflows
       }
 
-in  render rdfConfig
+in  rdfConfig

@@ -1,0 +1,104 @@
+executors:
+  someDockerExecutor:
+    environment:
+      FOO: bar
+    shell: zsh
+    docker:
+    - image: alpine
+      command:
+      - someCmd
+      - --someFlag
+      environment:
+        MICRO: soft
+      entrypoint:
+      - someProg
+      - someOtherProg
+      auth:
+        username: me
+        password: don'tdothis
+      user: root
+      name: localhost
+    - image: debian
+      command:
+      - someCmd
+      - --someFlag
+      aws_auth:
+        aws_access_key_id: secrets
+        aws_secret_access_key: eggs
+      environment:
+        ARCH: intel
+      entrypoint:
+      - someProg
+      - someOtherProg
+      user: deb
+      name: 10.0.0.1
+    working_directory: /somewhere
+    resource_class: small
+  someMacOSExecutor:
+    shell: bash
+    working_directory: /Users/jobs
+    macos:
+      xcode: '10.0'
+    resource_class: small
+  someMachineExecutor:
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: false
+    shell: csh
+    working_directory: /somewhere
+    resource_class: small
+jobs:
+  nix-build:
+    steps:
+    - checkout
+    - run:
+        command: ./do-the-build.sh
+        name: build
+    docker:
+    - image: nixos/nix:2.2.1
+  linux-build:
+    executor: someDockerExecutor
+    shell: bash
+    steps:
+    - run:
+        command: |
+          ./do/something
+          ./do --something ./else
+          some --other --preparation
+        name: prepare
+    - checkout
+    - run:
+        command: ./do-the-build.sh
+        name: build
+    parallelism: 4
+    working_directory: /somewhere
+    resource_class: small
+  macos-build:
+    executor: someMacOSExecutor
+    environment:
+      ON_MAC: 'TRUE'
+    shell: tcsh
+    steps:
+    - checkout
+    - run:
+        command: ./do-the-build.sh
+        name: build
+  deploy:
+    executor: someMachineExecutor
+    steps:
+    - run:
+        command: ./deploy.sh --production --yolo
+        name: deploy
+version: 2.1
+workflow:
+  build-and-deploy:
+    jobs:
+    - linux-build
+    - macos-build
+    - nix-build
+    - deploy:
+        requires:
+        - linux-build
+        - macos-build
+        - nix-build
+  version: 2

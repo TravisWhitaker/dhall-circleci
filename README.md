@@ -5,7 +5,7 @@ Use Dhall to Generate CircleCI YAML
 To run the (very small) exmaple:
 
 ```
-$ dhall-to-yaml --omitEmpty <<< './Example.dhall'
+$ dhall-to-yaml --omitEmpty <<< './Render.dhall ./rdf-example.dhall'
 ```
 
 If you find any mistakes (which you're more likely to find with features that
