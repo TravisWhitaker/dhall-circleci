@@ -31,7 +31,7 @@ jobs:
           nix-shell --pure --run "cabal new-update && cabal new-build -j$(nproc)"
         name: Build rdf
     docker:
-      image: nixos/nix:2.2.1
+    - image: nixos/nix:2.2.1
 version: 2
 workflow:
   version: 2

@@ -2,7 +2,28 @@ let types = ./Schema.dhall
 
 let render = ./Render.dhall
 
-let rdfDocker = { dockerImageName = "nixos/nix:2.2.1" }
+let plainImage =
+        λ(i : Text)
+      → [ { dockerImage =
+              i
+          , dockerReachableName =
+              None Text
+          , dockerEntryPoint =
+              [] : List Text
+          , dockerCommand =
+              [] : List Text
+          , dockerUser =
+              None Text
+          , dockerEnv =
+              [] : List types.EnvVar
+          , dockerLoginAuth =
+              None types.DockerLoginAuth
+          , dockerAWSAuth =
+              None types.DockerAWSAuth
+          }
+        ]
+
+let rdfDocker = types.ExecConfig.Docker (plainImage "nixos/nix:2.2.1")
 
 let updateStep =
       types.Step.Run
@@ -65,8 +86,8 @@ let buildStep =
 let buildJob =
       { jobName =
           "build"
-      , jobDocker =
-          rdfDocker
+      , jobExec =
+          types.JobExecConfig.ExecConfig rdfDocker
       , jobSteps =
           [ updateStep
           , freedomStep
@@ -76,6 +97,16 @@ let buildJob =
           , cachixStep
           , buildStep
           ]
+      , jobShell =
+          None Text
+      , jobWD =
+          None Text
+      , jobParallelism =
+          None Natural
+      , jobEnv =
+          [] : List types.EnvVar
+      , jobResourceClass =
+          None types.ResourceClass
       }
 
 let rdfWorkflows =
@@ -95,6 +126,15 @@ let rdfWorkflows =
           ]
       }
 
-let rdfConfig = { version = 2, jobs = [ buildJob ], workflows = rdfWorkflows }
+let rdfConfig =
+      { version =
+          types.Version.Version2
+      , executors =
+          [] : List types.Executor
+      , jobs =
+          [ buildJob ]
+      , workflows =
+          rdfWorkflows
+      }
 
 in  render rdfConfig
