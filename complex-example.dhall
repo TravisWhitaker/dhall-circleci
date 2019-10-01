@@ -43,7 +43,7 @@ let someMacOSImage = { macOSXCode = "10.0" }
 
 let execs =
       [ { execName = "someDockerExecutor"
-        , execResourceClass = Some "small"
+        , execResourceClass = Some types.ResourceClass.Small
         , execShell = Some "zsh"
         , execWD = Some "/somewhere"
         , execEnv = [ { envVarName = "FOO", envVarVal = "bar" } ]
@@ -51,14 +51,14 @@ let execs =
             types.ExecConfig.Docker [ someDockerImage, someOtherDockerImage ]
         }
       , { execName = "someMachineExecutor"
-        , execResourceClass = Some "small"
+        , execResourceClass = Some types.ResourceClass.Medium
         , execShell = Some "csh"
         , execWD = Some "/somewhere"
         , execEnv = [] : List types.EnvVar
         , execConfig = types.ExecConfig.Machine someMachineImage
         }
       , { execName = "someMacOSExecutor"
-        , execResourceClass = Some "small"
+        , execResourceClass = Some types.ResourceClass.Large
         , execShell = Some "bash"
         , execWD = Some "/Users/jobs"
         , execEnv = [] : List types.EnvVar
@@ -89,7 +89,7 @@ let buildLinuxJob =
       , jobWD = Some "/somewhere"
       , jobParallelism = Some 4
       , jobEnv = [] : List types.EnvVar
-      , jobResourceClass = Some "small"
+      , jobResourceClass = Some types.ResourceClass.FourGPU
       }
 
 let buildMacJob =
@@ -100,7 +100,7 @@ let buildMacJob =
       , jobWD = None Text
       , jobParallelism = None Natural
       , jobEnv = [ { envVarName = "ON_MAC", envVarVal = "TRUE" } ]
-      , jobResourceClass = None Text
+      , jobResourceClass = None types.ResourceClass
       }
 
 let buildNixJob =
@@ -111,7 +111,7 @@ let buildNixJob =
       , jobWD = None Text
       , jobParallelism = None Natural
       , jobEnv = [] : List types.EnvVar
-      , jobResourceClass = None Text
+      , jobResourceClass = None types.ResourceClass
       }
 
 let deployJob =
@@ -127,7 +127,7 @@ let deployJob =
       , jobWD = None Text
       , jobParallelism = None Natural
       , jobEnv = [] : List types.EnvVar
-      , jobResourceClass = None Text
+      , jobResourceClass = None types.ResourceClass
       }
 
 let jobs = [ buildLinuxJob, buildMacJob, buildNixJob, deployJob ]
@@ -156,10 +156,11 @@ let workflows =
       }
 
 let cfg =
-      { version = types.Version.Version21
-      , executors = execs
-      , jobs = jobs
-      , workflows = workflows
-      } : types.Config
+        { version = types.Version.Version21
+        , executors = execs
+        , jobs = jobs
+        , workflows = workflows
+        }
+      : types.Config
 
 in  cfg

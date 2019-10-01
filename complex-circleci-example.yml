@@ -39,14 +39,14 @@ executors:
     working_directory: /Users/jobs
     macos:
       xcode: '10.0'
-    resource_class: small
+    resource_class: large
   someMachineExecutor:
     machine:
       image: circleci/classic:latest
       docker_layer_caching: false
     shell: csh
     working_directory: /somewhere
-    resource_class: small
+    resource_class: medium
 jobs:
   nix-build:
     steps:
@@ -72,7 +72,7 @@ jobs:
         name: build
     parallelism: 4
     working_directory: /somewhere
-    resource_class: small
+    resource_class: 4GPU
   macos-build:
     executor: someMacOSExecutor
     environment:
